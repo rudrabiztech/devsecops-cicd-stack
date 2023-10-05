@@ -1,0 +1,52 @@
+---
+version: '3.7'
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    privileged: true
+    user: root
+    ports:
+      - 8090:8080
+      - 50000:50000
+    volumes:
+      - jenkins-home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+  nexus:
+    container_name: nexus
+    image: sonatype/nexus3
+    volumes:
+      - nexus-data:/sonatype-work
+    ports:
+      - 8081:8081
+  gitlab-ce:
+    container_name: gitlab-ce
+    image: gitlab/gitlab-ce:latest
+    restart: always
+    hostname: localhost
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.cloudopsio.com'
+    ports:
+      - 8080:80
+      - 8443:443
+    volumes:
+      - gitlab-data:/var/opt/gitlab
+      - gitlab-logs:/var/log/gitlab
+      - gitlab-config:/etc/gitlab
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine
+    container_name: gitlab-runner
+    restart: always
+    depends_on:
+      - gitlab-ce
+    volumes:
+      - gitlab-runner-config:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+volumes:
+  jenkins-home:
+  nexus-data:
+  gitlab-data:
+  gitlab-logs:
+  gitlab-config:
+  gitlab-runner-config:

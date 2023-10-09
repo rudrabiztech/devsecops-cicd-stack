@@ -2,7 +2,7 @@
 version: '3.7'
 services:
   jenkins:
-    image: jenkins/jenkins:lts
+    image: makwanji/devsecops-cicd-stack:jenkins-0.0.1
     container_name: jenkins
     privileged: true
     user: root
